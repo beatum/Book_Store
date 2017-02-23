@@ -50,6 +50,14 @@ class LibraryBook(models.Model):
 						search='_search_age', 
 						store=False,compute_sudo=False)
 
+	publisher_city = fields.Char('Publisher City', related='publisher_id.city')
+	ref_doc_id = fields.Reference(
+		selection='_referencable_models', string='Reference Document')
+	
+	@api.model
+	def _referencable_models(self):
+		models = self.env['res.request.link'].search([])
+		return [(x.object, x.name) for x in models]
 
 	@api.constrains('date_release')
 	def _check_release_date(self):
@@ -73,9 +81,17 @@ class LibraryBook(models.Model):
 			d = td(days=book.age_days)-today
 			book.date_release = fDate.to_string(d)
 			
+	def _search_age(self):
+		today = fDate.from_string(fDate.today())
+		value_days = td(days=value)
+		value_date = fDate.to_string(today - value_days)
+		return [('date_release', operator, value_date)]
+		
 
 
 class ResPartner(models.Model):
 	_inherit='res.partner'
+	_order = 'name'
 	books_ids = fields.One2many('library.book','publisher_id',string='Published Books')
 	books_ids =fields.Many2many('library.book',string='Authored Books')
+	
