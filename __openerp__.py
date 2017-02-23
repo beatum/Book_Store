@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "/opt/odoo/dan_addons/book_store",
+    'name': "Book Store",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+            Manage Your Books
+        """,
 
     'description': """
-        Long description of module's purpose
+        Manage your Books, share your books, comment about your books.
+
+        **Live Happy**.
     """,
 
-    'author': "My Company",
-    'website': "http://www.yourcompany.com",
+    'author': "Daniel Mutwiri",
+    'website': "http://www.otbafrica.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml

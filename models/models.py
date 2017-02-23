@@ -2,14 +2,9 @@
 
 from openerp import models, fields, api
 
-# class /opt/odoo/dan_addons/book_store(models.Model):
-#     _name = '/opt/odoo/dan_addons/book_store./opt/odoo/dan_addons/book_store'
 
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         self.value2 = float(self.value) / 100
+class LibraryBook(models.Model):
+	_name='library.book'
+	name = fields.Char('Title', required=True)
+	date_release = fields.Date()
+	authors_id = fields.Many2many('res.partner', string="Authors")
