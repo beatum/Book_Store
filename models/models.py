@@ -8,6 +8,10 @@ class LibraryBook(models.Model):
 	_description = 'Library of Books'
 	_order = 'date_release desc, name'
 	_rec_name = 'short_name'
+
+	_sql_constraints = [
+			('name_uniq','UNIQUE (name)','Book Title Already Taken')
+		]
 	name = fields.Char('Title', required=True)
 	short_name = fields.Char(string='Short Title',size=100, translate=False)
 	date_release = fields.Date('Release Date')
@@ -39,10 +43,17 @@ class LibraryBook(models.Model):
 	publisher_id = fields.Many2one(
 		'res.partner',string='Publisher',ondelete='set null',context={}, domain=[],)
 
-
+	api.constrains('date_release')
+	def _check_release_date(self):
+		for r in self:
+			if r.date_release > fields.Date.today():
+				raise models.ValidationError(
+						'Release Date must be in the past'
+					)
 
 
 
 class ResPartner(models.Model):
 	_inherit='res.partner'
-	books_ids = fields.One2Many('library.book','publisher_id',string='Published Books')
+	books_ids = fields.One2many('library.book','publisher_id',string='Published Books')
+	books_ids =fields.Many2many('library.book',string='Authored Books')
