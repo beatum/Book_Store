@@ -2,6 +2,7 @@
 
 from openerp import models, fields, api
 from openerp.addons import decimal_precision as dp
+from openerp.fields import Date as fDate
 
 class LibraryBook(models.Model):
 	_name='library.book'
@@ -43,7 +44,14 @@ class LibraryBook(models.Model):
 	publisher_id = fields.Many2one(
 		'res.partner',string='Publisher',ondelete='set null',context={}, domain=[],)
 
-	api.constrains('date_release')
+	age_days = fields.Float(string='Days Since Release', 
+						compute='_compute_age',
+						inverse='_inverse_age',
+						search='_search_age', 
+						store=False,compute_sudo=False)
+
+
+	@api.constrains('date_release')
 	def _check_release_date(self):
 		for r in self:
 			if r.date_release > fields.Date.today():
@@ -51,6 +59,20 @@ class LibraryBook(models.Model):
 						'Release Date must be in the past'
 					)
 
+	@api.depends('date_release')
+	def _compute_age(self):
+		today = fDate.from_string(fDate.today())
+		for book in self.filtered('date_release'):
+			delta = (fDate.from_string(book.date_release - today))
+			book.age_days = delta.days
+		
+
+	def _inverse_age(self):
+		today= fDate.from_string(fDate.today())
+		for  book in self.filtered('date_release'):
+			d = td(days=book.age_days)-today
+			book.date_release = fDate.to_string(d)
+			
 
 
 class ResPartner(models.Model):
