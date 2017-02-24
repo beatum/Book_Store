@@ -6,6 +6,7 @@ from openerp.fields import Date as fDate
 
 class LibraryBook(models.Model):
 	_name='library.book'
+	#_inherit = ['base.archive']
 	_description = 'Library of Books'
 	_order = 'date_release desc, name'
 	_rec_name = 'short_name'
@@ -94,4 +95,31 @@ class ResPartner(models.Model):
 	_order = 'name'
 	books_ids = fields.One2many('library.book','publisher_id',string='Published Books')
 	books_ids =fields.Many2many('library.book',string='Authored Books')
-	
+	authored_book_ids = fields.Many2many('library.book',string="Authored Books")
+	count_books = fields.Integer('Number of Authored Books', compute='_compute_count_books')
+
+	@api.depends('authored_book_ids')
+	def _compute_count_books(self):
+		for r in self:
+			r.count_books = len(r.authored_book_ids)
+
+
+
+class BaseArchive(models.AbstractModel):
+	_name='base.archive'
+	active=fields.Boolean(default=True)
+
+	def do_archive(self):
+		for record in self:
+			record.active = not record.active
+		pass
+
+
+
+class LibraryMember(models.Model):
+	_name='library.member'
+	_inherits = {'res.partner': 'partner_id'}
+	partner_id = fields.Many2one('res.partner', ondelete="cascade")
+	date_start = fields.Date('Member Since')
+	date_end= fields.Date('Termination Date')
+	member_number=fields.Char('Your Member Number')

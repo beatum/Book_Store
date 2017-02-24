@@ -9,7 +9,8 @@
     'description': """
         Manage your Books, share your books, comment about your books.
 
-        **Live Happy**.
+        **Live Happy**  .. image:: http://localhost:8069/book_store/static/description/smile1.jpg .
+
     """,
 
     'author': "Daniel Mutwiri",
@@ -22,7 +23,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','decimal_precision',],
+    'depends': ['base','decimal_precision'],
 
     # always loaded
     'data': [
