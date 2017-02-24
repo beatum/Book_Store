@@ -60,6 +60,26 @@ class LibraryBook(models.Model):
 		models = self.env['res.request.link'].search([])
 		return [(x.object, x.name) for x in models]
 
+	@api.model
+	def is_allowed_transition(self,old_state,new_state):
+		allowed= [
+					('draft','available'),
+					('available','borrowed'),
+					('borrowed','available'),
+					('available','lost'),
+					('borrowed','lost'),
+					('lost','available'),
+				]
+		return (old_state,new_state) in allowed
+	@api.multi
+	def change_state(self, new_state):
+		for book in self:
+			if book.is_allowed_transition(book.state,new_state):
+				book.state = new_state
+			else:
+				continue
+
+				
 	@api.constrains('date_release')
 	def _check_release_date(self):
 		for r in self:
