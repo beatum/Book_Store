@@ -9,7 +9,9 @@
     'description': """
         Manage your Books, share your books, comment about your books.
 
-        **Live Happy**  .. image:: http://localhost:8069/book_store/static/description/smile1.jpg .
+        **Live Happy**  .. image:: http://localhost:8069/book_store/static/description/smile1.jpg
+
+        
 
     """,
 

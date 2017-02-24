@@ -3,6 +3,7 @@
 from openerp import models, fields, api
 from openerp.addons import decimal_precision as dp
 from openerp.fields import Date as fDate
+from openerp.exceptions import UserError
 
 class LibraryBook(models.Model):
 	_name='library.book'
@@ -79,7 +80,12 @@ class LibraryBook(models.Model):
 			else:
 				continue
 
-				
+	@api.model
+	def get_all_library_members(self):
+		library_member_model = self.env['library.member']
+		return library_member_model.search([])
+
+
 	@api.constrains('date_release')
 	def _check_release_date(self):
 		for r in self:
@@ -113,11 +119,19 @@ class LibraryBook(models.Model):
 class ResPartner(models.Model):
 	_inherit='res.partner'
 	_order = 'name'
+	name= fields.Char('Name',required=True)
+	email = fields.Char('Email')
+	date = fields.Date('Date')
+	is_company = fields.Boolean('Is a company')
+	parent_id = fields.Many2one('res.partner','Related Company')
+	child_ids = fields.One2many('res.partner','parent_id', 'Contacts')
 	books_ids = fields.One2many('library.book','publisher_id',string='Published Books')
 	books_ids =fields.Many2many('library.book',string='Authored Books')
 	authored_book_ids = fields.Many2many('library.book',string="Authored Books")
 	count_books = fields.Integer('Number of Authored Books', compute='_compute_count_books')
 
+
+	
 	@api.depends('authored_book_ids')
 	def _compute_count_books(self):
 		for r in self:
@@ -143,3 +157,17 @@ class LibraryMember(models.Model):
 	date_start = fields.Date('Member Since')
 	date_end= fields.Date('Termination Date')
 	member_number=fields.Char('Your Member Number')
+
+	@api.multi
+	def save(self,filename):
+		if '/' in filename or '\\' in filename:
+			raise UserError('Illegal filename %s' %filename)
+		path = os.path.join('/opt/exports', filename)
+		try:
+			with open(path,'w') as fobj:
+				for record in self:
+					fobj.write(record.data)
+					fobj.write('\n')
+		except (IOError, OSError) as exc:
+			message = 'Unable to save file: ' %s % exc
+			raise UserError(message)
