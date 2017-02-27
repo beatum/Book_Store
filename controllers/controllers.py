@@ -19,5 +19,13 @@ class main(http.Controller):
 		records=request.env['library.book'].sudo().search([])
 
 		return records.read(['name'])
-		pass
+	
+	@http.route('/books', type="http", auth="user", website=True)
+	def route(self):
+		return request.render(
+				'book_store',
+				{
+					'books':request.env['library.book'].search([]),
+				}
+			)
 
